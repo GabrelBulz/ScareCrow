@@ -34,6 +34,7 @@ namespace Final_camera
         private Button gtake_pic;
         private Button gswitch_cam;
         private Button gthrow;
+        private Button gedit;
         public Camera gCam;
         private int gNr_of_cam;
         private int gDef_front_cam;
@@ -61,6 +62,9 @@ namespace Final_camera
 
             FindInstance();
             gthrow.Visibility = ViewStates.Invisible;
+            gedit.Visibility = ViewStates.Invisible;
+            gedit.Enabled = false;
+
 
             ///#############################  switch cam_function to be implemented from this prototype
             gswitch_cam.Click += delegate
@@ -113,8 +117,10 @@ namespace Final_camera
 
                 //rezolv treaba cu butoanele
                 gthrow.Visibility = ViewStates.Visible;
-                gtake_pic.Text = "Edit";
-
+                gtake_pic.Visibility = ViewStates.Invisible;
+                gtake_pic.Enabled = false;
+                gedit.Visibility = ViewStates.Visible;
+                gedit.Enabled = true;
 
 
                 //Intent intent = new Intent(this, typeof(PhotoView));
@@ -129,6 +135,9 @@ namespace Final_camera
 
             //if throw button is pressed delete picture
             delete_pic_if_needed();
+            //if Edit button is pressed
+            edit_pic();
+
 
 
             gNr_of_cam = Camera.NumberOfCameras;   ///daca nr de cam =1 atunci va fi nevoie sa dam disable la butonu de switch cam, care trebe si ala facut
@@ -163,7 +172,6 @@ namespace Final_camera
 
 
         }
-
 
         protected override void OnResume()
         {
@@ -218,6 +226,7 @@ namespace Final_camera
             gsurf_view = FindViewById<SurfaceView>(Resource.Id.surfaceView1);
             gswitch_cam = FindViewById<Button>(Resource.Id.switch_cam);
             gthrow = FindViewById<Button>(Resource.Id.throw_but);
+            gedit = FindViewById<Button>(Resource.Id.Edit);
             ///sufr takeIdBy
         }
 
@@ -235,7 +244,6 @@ namespace Final_camera
         public async void OnPictureTaken(byte[] data, Camera camera)
         {
             img_container.bitma_pic = Android.Graphics.BitmapFactory.DecodeByteArray(data, 0, data.Length);
-
 
             string cur_time_milisec = System.DateTime.Now.Millisecond.ToString();
             string cur_time_sec = System.DateTime.Now.Second.ToString();
@@ -274,6 +282,23 @@ namespace Final_camera
 
         }
 
+        void edit_pic()
+        {
+            gedit.Click += delegate
+            {
+                if (gedit.Visibility == ViewStates.Visible && gedit.Enabled == true)
+                {
+                    Intent PhotoView = new Intent(this, typeof(PhotoView));
+                    PhotoView.PutExtra("ImageDirectory", img_container.gdirectory);
+                    PhotoView.PutExtra("Temp_Storage", img_container.temp_storage);
+                    PhotoView.PutExtra("PathFile", img_container.path_file);
+                    PhotoView.PutExtra("AbsolutePath", img_container.absolut_path_pic);
+                    //PhotoView.PutExtra("Bitmap", img_container.bitma_pic);
+                    StartActivity(PhotoView);
+                    Finish();
+                }
+            };
+        }
 
         void delete_pic_if_needed()
         {

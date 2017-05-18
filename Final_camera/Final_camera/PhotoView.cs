@@ -22,15 +22,32 @@ namespace Final_camera
         Button gThrow;
         ImageView gimg_view;
         private Android.Graphics.Bitmap bitmap_img;
+
+        //Data From CameraSurface Activity
+        public File gdirectory;
+        public File temp_storage;
+        public string path_file;
+        public Android.Graphics.Bitmap bitma_pic;
+        public string absolut_path_pic;
+
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
             SetContentView(Resource.Layout.PhotoView);
 
+            //Set Data from CameraSurface Acivity in this Activity
+            gdirectory = (File)Intent.GetStringExtra("ImageDirectory");
+            temp_storage = (File)Intent.GetStringExtra("Temp_Storage");
+            path_file = (string)Intent.GetStringExtra("PathFile");
+            absolut_path_pic = (string)Intent.GetStringExtra("AbsolutePath");
+
             FindID(this);
 
-            bitmap_img = JsonConvert.DeserializeObject<Android.Graphics.Bitmap>(Intent.GetStringExtra("img_pack"));
+            bitmap_img = Android.Graphics.BitmapFactory.DecodeFile(absolut_path_pic);
+
+            //Android.Graphics.Color
 
             gimg_view.SetImageBitmap(bitmap_img);
 
