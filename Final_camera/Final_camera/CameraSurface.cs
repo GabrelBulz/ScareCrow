@@ -33,6 +33,7 @@ namespace Final_camera
     {
         private Button gtake_pic;
         private Button gswitch_cam;
+        private Button gthrow;
         public Camera gCam;
         private int gNr_of_cam;
         private int gDef_front_cam;
@@ -59,6 +60,8 @@ namespace Final_camera
             SetContentView(Resource.Layout.CameraSurface);
 
             FindInstance();
+            gthrow.Visibility = ViewStates.Invisible;
+
             ///#############################  switch cam_function to be implemented from this prototype
             gswitch_cam.Click += delegate
             {
@@ -86,8 +89,18 @@ namespace Final_camera
                     gprew_cam.Switch_cam(gCam);
 
                     gCam.StartPreview();
+
+                    //rezolv treaba cu butoanele de jos
+                    gtake_pic.Text = "Take pic";
+                    gthrow.Visibility = ViewStates.Gone;
+
                 }
             };/// ###################   end switch cam
+
+
+
+
+            ///##take pic function in main
 
             gtake_pic.Click += delegate
             {
@@ -98,6 +111,11 @@ namespace Final_camera
                 gCam.TakePicture(null, null, this);
 
 
+                //rezolv treaba cu butoanele
+                gthrow.Visibility = ViewStates.Visible;
+                gtake_pic.Text = "Edit";
+
+
 
                 //Intent intent = new Intent(this, typeof(PhotoView));
                 //intent.PutExtra("img_pack", JsonConvert.SerializeObject(img_container.bitma_pic));
@@ -106,6 +124,12 @@ namespace Final_camera
 
                 //Finish();
             };
+            ///## end here
+
+
+            //if throw button is pressed delete picture
+            delete_pic_if_needed();
+
 
             gNr_of_cam = Camera.NumberOfCameras;   ///daca nr de cam =1 atunci va fi nevoie sa dam disable la butonu de switch cam, care trebe si ala facut
 
@@ -124,6 +148,8 @@ namespace Final_camera
             //{
             //    gtake_pic.Text = "NULL";
             //} // am verificat daca am camera, sigur am
+
+
 
             gcur_cam = gDef_front_cam;
 
@@ -162,6 +188,11 @@ namespace Final_camera
             gCam.SetParameters(gparam);
 
             gCam.StartPreview();
+
+
+            //cand revine in app butoanele trebuie setate din nou butoanele
+            gthrow.Visibility = ViewStates.Gone;
+            gtake_pic.Text = "Take pic";
             ///preview-ul de gatat
         }
 
@@ -186,6 +217,7 @@ namespace Final_camera
             gtake_pic = FindViewById<Button>(Resource.Id.take_pic);
             gsurf_view = FindViewById<SurfaceView>(Resource.Id.surfaceView1);
             gswitch_cam = FindViewById<Button>(Resource.Id.switch_cam);
+            gthrow = FindViewById<Button>(Resource.Id.throw_but);
             ///sufr takeIdBy
         }
 
@@ -239,6 +271,29 @@ namespace Final_camera
             outstream.Write(byte_array);
             outstream.Flush();
             outstream.Close();
+
+        }
+
+
+        void delete_pic_if_needed()
+        {
+            gthrow.Click += delegate
+             {
+                 if (gthrow.Visibility == ViewStates.Visible)
+                 {
+                    // Android.Net.Uri uri = Android.Net.Uri.Parse(img_container.absolut_path_pic);
+                     Java.IO.File fis = new Java.IO.File(img_container.absolut_path_pic);
+
+
+                     if (fis.Exists())
+                         fis.Delete();
+
+                     Recreate();
+
+                     gtake_pic.Text = "Take pic";
+                     gthrow.Visibility = ViewStates.Gone;
+                 }
+             };
 
         }
 
