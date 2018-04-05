@@ -23,11 +23,12 @@ using Java.IO;
 using Newtonsoft.Json;
 using Android.Media;
 using System.IO;
+using Android.Content.PM;
 
 namespace Final_camera
 {
     [Activity(Label = "ScareCrow", MainLauncher = false, Icon = "@drawable/icon",
-       Theme = "@android:style/Theme.Black.NoTitleBar.Fullscreen")]
+       Theme = "@android:style/Theme.Black.NoTitleBar.Fullscreen", ScreenOrientation = ScreenOrientation.Portrait)]
     public class CameraSurface : Activity, IPictureCallback
 
     {
@@ -42,6 +43,7 @@ namespace Final_camera
         private SurfaceView gsurf_view;
         private Camera.Parameters gparam;
         Preview gprew_cam;
+        int pic_taken = 0;
 
         ///these can be erased if u manage to use the_image class
         private Java.IO.File gdirectory;
@@ -64,6 +66,7 @@ namespace Final_camera
             gthrow.Visibility = ViewStates.Invisible;
             gedit.Visibility = ViewStates.Invisible;
             gedit.Enabled = false;
+            pic_taken = 0;
 
 
             ///#############################  switch cam_function to be implemented from this prototype
@@ -92,10 +95,12 @@ namespace Final_camera
 
                     gprew_cam.Switch_cam(gCam);
 
+                    gparam = gCam.GetParameters();
+                    gCam.SetParameters(gparam);
+
                     gCam.StartPreview();
 
                     //rezolv treaba cu butoanele de jos
-                    gtake_pic.Text = "Take pic";
                     gthrow.Visibility = ViewStates.Gone;
 
                 }
@@ -117,10 +122,16 @@ namespace Final_camera
 
                 //rezolv treaba cu butoanele
                 gthrow.Visibility = ViewStates.Visible;
+                gthrow.Enabled = true;
                 gtake_pic.Visibility = ViewStates.Invisible;
                 gtake_pic.Enabled = false;
+                gedit.SetWidth(gtake_pic.Width);
                 gedit.Visibility = ViewStates.Visible;
                 gedit.Enabled = true;
+                gswitch_cam.Visibility = ViewStates.Invisible;
+                gswitch_cam.Enabled = false;
+                pic_taken = 1;
+
 
 
                 //Intent intent = new Intent(this, typeof(PhotoView));
@@ -163,6 +174,10 @@ namespace Final_camera
             gcur_cam = gDef_front_cam;
 
             gparam = gCam.GetParameters();
+
+            if(gparam.FocusMode.Contains(Camera.Parameters.FocusModeAuto))
+                gparam.FocusMode = Camera.Parameters.FocusModeAuto;
+
             gCam.SetParameters(gparam);
 
             gprew_cam = new Preview(this, gsurf_view);
@@ -193,6 +208,10 @@ namespace Final_camera
             }
 
             gparam = gCam.GetParameters();
+
+            if (gparam.FocusMode.Contains(Camera.Parameters.FocusModeAuto))
+                gparam.FocusMode = Camera.Parameters.FocusModeAuto;
+
             gCam.SetParameters(gparam);
 
             gCam.StartPreview();
@@ -200,7 +219,25 @@ namespace Final_camera
 
             //cand revine in app butoanele trebuie setate din nou butoanele
             gthrow.Visibility = ViewStates.Gone;
-            gtake_pic.Text = "Take pic";
+
+            if(pic_taken == 1)
+            {
+                gswitch_cam.Visibility = ViewStates.Invisible;
+                gswitch_cam.Enabled = false;
+
+                gthrow.Visibility = ViewStates.Visible;
+                gthrow.Enabled = true;
+            }
+            else
+            {
+                gswitch_cam.Visibility = ViewStates.Visible;
+                gswitch_cam.Enabled = true;
+
+                gthrow.Visibility = ViewStates.Gone;
+                gthrow.Enabled = false;
+            }
+
+            
             ///preview-ul de gatat
         }
 
@@ -315,8 +352,8 @@ namespace Final_camera
 
                      Recreate();
 
-                     gtake_pic.Text = "Take pic";
                      gthrow.Visibility = ViewStates.Gone;
+                     pic_taken = 0;
                  }
              };
 
@@ -369,6 +406,10 @@ namespace Final_camera
             PrewCam.SetDisplayOrientation(90);
 
             Camera.Parameters param = camm.GetParameters();
+
+            if (param.FocusMode.Contains(Camera.Parameters.FocusModeAuto))
+                param.FocusMode = Camera.Parameters.FocusModeAuto;
+
             RequestLayout();
 
             camm.SetParameters(param);
@@ -415,6 +456,10 @@ namespace Final_camera
         public void SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int x, int y)
         {
             Camera.Parameters parameters = PrewCam.GetParameters();
+
+            if (parameters.FocusMode.Contains(Camera.Parameters.FocusModeAuto))
+                parameters.FocusMode = Camera.Parameters.FocusModeAuto;
+            cam_prew.SetParameters(parameters);
 
             RequestLayout();
 
